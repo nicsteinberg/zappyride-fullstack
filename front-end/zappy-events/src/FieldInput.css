@@ -1,0 +1,17 @@
+.fieldInput {
+  display: flex;
+  align-items: center;
+  margin: 5px;
+  padding: 10px;
+}
+  
+.inputBox {
+  width: 100%;
+}
+
+.label {
+  width: 100%;
+  text-align: left;
+  margin-right: 10px;
+  font-family: 'Bungee';
+}

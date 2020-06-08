@@ -1,0 +1,29 @@
+@font-face {
+  font-family: 'Bungee';
+  src: local('Bungee'), url(./fonts/BungeeLayers-Regular.otf) format('truetype');
+}
+
+body {
+  text-align: center;
+}
+
+.header {
+  font-size: 20px;
+  font-family: 'Bungee';
+  padding: 15px;
+  background-color: #0E6655;
+  color: #EAFAF1;
+  text-align: center;
+  border-bottom: 3px dashed white;
+}
+
+button {
+  font-family: 'Bungee';
+  background-color: #0E6655;
+  color: white;
+  border-color: white;
+}
+
+.body {
+  display: flex;
+}

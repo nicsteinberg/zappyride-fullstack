@@ -1,0 +1,30 @@
+table {
+    width: 90%;
+    table-layout: fixed;
+    margin: auto;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+    border: 1px solid #0E6655;
+}
+  
+th {
+    background-color: #0E6655;
+    color: #EAFAF1;
+    border-bottom: 1px solid #0E6655;
+    padding: 10px;
+}
+
+tr, td {
+    padding: 10px;
+}
+
+.bigButton {
+    margin: 10px;
+    padding: 5px;
+}
+  
+.eventsDisplay {
+    width: 100%;
+    margin-top: 20px;
+}

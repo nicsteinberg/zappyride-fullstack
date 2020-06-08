@@ -3,25 +3,25 @@ package io.github.marcinczeczko.model;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public class Todo {
+public class DeleteEvent {
 
   private String id;
-  private String name;
+  private String date;
 
-  public Todo() {
+  public DeleteEvent() {
     //Default constructor
   }
 
-  public Todo(String id, String name) {
+  public DeleteEvent(String id, String date) {
+    this.date = date;
     this.id = id;
-    this.name = name;
   }
 
   public String getId() {
     return id;
   }
 
-  public String getName() {
-    return name;
+  public String getDate() {
+    return date;
   }
 }

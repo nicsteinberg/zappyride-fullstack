@@ -1,0 +1,16 @@
+.updateButton {
+  font-size: 12px;
+  margin: 2px;
+  padding: 5px;
+}
+
+.deleteButton {
+  font-size: 12px;
+  margin: 2px;
+  padding: 5px;
+  background-color: darkred;
+}
+
+.oddRow {
+    background-color: #EAFAF1;
+}

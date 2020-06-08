@@ -5,14 +5,16 @@ frameworkVersion: ">=1.56.1"
 custom:
   function:
     addHandler: add
+    deleteHandler: delete
     fetchHandler: fetchAll
+    updateHandler: update
   dynamodb:
     tableName: ${self:service}-${opt:stage, self:provider.stage}
 
 provider:
   name: aws
   stage: dev
-  region: eu-central-1
+  region: us-east-1
   tracing:
     lambda: true
   iamRoleStatements:
@@ -25,7 +27,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["TodosDynamoDbTable", "Arn" ] }
+        - { "Fn::GetAtt": ["EventsDynamoDbTable", "Arn" ] }
 
 package:
   individually: true
@@ -53,6 +55,30 @@ functions:
       - http:
           method: post
           path: addjvm
+  updateJvm:
+    runtime: java8
+    handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+    package:
+      artifact: target/quarkus-lambda-native-3.0-SNAPSHOT-runner.jar
+    environment:
+      JAVA_TOOL_OPTIONS: -Dquarkus.profile=${opt:stage, self:provider.stage} -Dquarkus.lambda.handler=${self:custom.function.updateHandler} -Ddynamo.table.name=${self:custom.dynamodb.tableName} -Dquarkus.dynamodb.aws.region=${self:provider.region}
+    events:
+      - http:
+          method: put
+          path: updatejvm
+          cors: true
+  deleteJvm:
+    runtime: java8
+    handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+    package:
+      artifact: target/quarkus-lambda-native-3.0-SNAPSHOT-runner.jar
+    environment:
+      JAVA_TOOL_OPTIONS: -Dquarkus.profile=${opt:stage, self:provider.stage} -Dquarkus.lambda.handler=${self:custom.function.deleteHandler} -Ddynamo.table.name=${self:custom.dynamodb.tableName} -Dquarkus.dynamodb.aws.region=${self:provider.region}
+    events:
+      - http:
+          method: delete
+          path: deletejvm
+          cors: true
   fetchNative:
     runtime: provided
     handler: native.handler
@@ -67,7 +93,8 @@ functions:
     events:
       - http:
           method: get
-          path: fetchNative
+          path: events
+          cors: true
   addNative:
     runtime: provided
     handler: native.handler
@@ -82,20 +109,57 @@ functions:
     events:
       - http:
           method: post
-          path: addNative
+          path: events
+          cors: true
+  updateNative:
+    runtime: provided
+    handler: native.handler
+    package:
+      artifact: target/function.zip
+    environment:
+      DISABLE_SIGNAL_HANDLERS: true
+      QUARKUS_LAMBDA_HANDLER: ${self:custom.function.updateHandler}
+      DYNAMO_TABLE_NAME: ${self:custom.dynamodb.tableName}
+      QUARKUS_DYNAMODB_AWS_REGION: ${self:provider.region}
+      QUARKUS_PROFILE: ${opt:stage, self:provider.stage}
+    events:
+      - http:
+          method: put
+          path: events
+          cors: true
+  deleteNative:
+    runtime: provided
+    handler: native.handler
+    package:
+      artifact: target/function.zip
+    environment:
+      DISABLE_SIGNAL_HANDLERS: true
+      QUARKUS_LAMBDA_HANDLER: ${self:custom.function.deleteHandler}
+      DYNAMO_TABLE_NAME: ${self:custom.dynamodb.tableName}
+      QUARKUS_DYNAMODB_AWS_REGION: ${self:provider.region}
+      QUARKUS_PROFILE: ${opt:stage, self:provider.stage}
+    events:
+      - http:
+          method: delete
+          path: events
+          cors: true
 
 resources:
   Resources:
-    TodosDynamoDbTable:
+    EventsDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          - AttributeName: todoId
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: date
             AttributeType: S
         KeySchema:
-          - AttributeName: todoId
+          - AttributeName: id
             KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
